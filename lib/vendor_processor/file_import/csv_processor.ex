@@ -33,6 +33,8 @@ defmodule VendorProcessor.FileImport.CSVProcessor do
   end
 
   defp no_nil_fields_filter(vendor_data) do
+    vendor_data = Map.drop(vendor_data, [:updated_at])
+
     if Enum.any?(Map.values(vendor_data), &is_nil/1) do
       Logger.error("Vendor data of id `#{vendor_data.id}` contains null fields: #{inspect(vendor_data)}")
       false
