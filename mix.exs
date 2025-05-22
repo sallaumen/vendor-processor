@@ -24,7 +24,8 @@ defmodule VendorProcessor.MixProject do
   defp deps do
     [
       {:csv, "~> 3.2"},
-      {:req, "~> 0.5"}
+      {:req, "~> 0.5"},
+      {:plug, "~> 1.17"}
     ]
   end
 end

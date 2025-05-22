@@ -16,8 +16,6 @@ defmodule VendorProcessor.FileImport.CSVProcessor do
   require Logger
   alias VendorProcessor.FileImport.VendorData
 
-  # support cli:
-  # recompile && File.stream!("/home/tavano/projects/vendor-processor/priv/vendors-ex.csv") |> VendorProcessor.FileImport.CSVProcessor.process_csv_stream
   @spec process_csv_stream(String.t()) :: list(VendorData.t())
   def process_csv_stream(data_stream) do
     data_stream
