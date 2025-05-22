@@ -7,7 +7,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
 
   describe "authenticate/1" do
     test "when 2xx response, should return {:ok, Req.Response} tuple with details" do
-      Test.stub(VicAi, fn conn ->
+      Test.expect(VicAi, fn conn ->
         Test.json(conn, %{
           "access_token" => "example token",
           "expires_in" => 3600,
@@ -30,7 +30,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
     end
 
     test "when invalid credentials given, should return {:ok, Req.Response} tuple with details 400 status" do
-      Test.stub(VicAi, fn conn ->
+      Test.expect(VicAi, fn conn ->
         Conn.send_resp(conn, :bad_request, ~s|{"code": 400, "message": "invalid credentials"}|)
       end)
 
@@ -56,7 +56,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
 
   describe "health_check/1" do
     test "when 2xx response, should return {:ok, Req.Response} tuple with details" do
-      Test.stub(VicAi, fn conn ->
+      Test.expect(VicAi, fn conn ->
         Test.json(conn, %{"company" => "test", "status" => "PASS", "version" => "1.0"})
       end)
 
@@ -71,7 +71,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
     end
 
     test "when non 404 response, should return {:ok, Req.Response} tuple with details" do
-      Test.stub(VicAi, fn conn ->
+      Test.expect(VicAi, fn conn ->
         Conn.send_resp(conn, :not_found, ~s|{"code": 404, "message": "not found"}|)
       end)
 

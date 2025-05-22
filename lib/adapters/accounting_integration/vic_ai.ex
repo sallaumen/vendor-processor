@@ -1,4 +1,5 @@
 defmodule Adapters.AccountingIntegration.VicAi do
+  alias Adapters.AccountingIntegration.VicAiTokenManager
   alias Ports.AccountingIntegration
 
   @behaviour AccountingIntegration
@@ -39,5 +40,5 @@ defmodule Adapters.AccountingIntegration.VicAi do
   end
 
   defp get_authentication_headers(),
-    do: [headers: [{"Authorization", "MpPcTPACkmY5aRUmTxC5g4XNPM99b1ho1kUAeUunFbTRgbSm4WqwDPfLCKK93jxg"}]]
+    do: [headers: [{"Authorization", VicAiTokenManager.get_token()}]]
 end

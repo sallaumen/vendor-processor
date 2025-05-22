@@ -14,6 +14,13 @@ config :logger, :console,
 
 config :vendor_processor, Ports.AccountingIntegration, adapter: Adapters.AccountingIntegration.VicAi
 
-config :vendor_processor, Adapters.AccountingIntegration.VicAi, vic_ai_req_options: []
+config :vendor_processor, Adapters.AccountingIntegration.VicAi,
+  vic_ai_req_options: [
+    max_retries: 0,
+    receive_timeout: 5_000
+  ]
+
+config :vendor_processor, Adapters.AccountingIntegration.VicAiTokenManager,
+  authentication_fn: &Adapters.AccountingIntegration.VicAi.authenticate/0
 
 import_config "#{config_env()}.exs"

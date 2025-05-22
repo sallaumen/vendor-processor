@@ -14,6 +14,7 @@ defmodule VendorProcessor.MixProject do
 
   def application do
     [
+      mod: {VendorProcessor.Application, []},
       extra_applications: [:logger]
     ]
   end
