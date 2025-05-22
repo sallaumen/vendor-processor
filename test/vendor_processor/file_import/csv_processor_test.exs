@@ -1,7 +1,7 @@
 defmodule VendorProcessor.FileImport.CSVProcessorTest do
   use ExUnit.Case, async: true
   alias VendorProcessor.FileImport.CSVProcessor
-  alias VendorProcessor.FileImport.VendorData
+  alias VendorProcessor.VendorData
 
   import ExUnit.CaptureLog
 
@@ -60,7 +60,7 @@ defmodule VendorProcessor.FileImport.CSVProcessorTest do
 
       assert log =~
                "[error] Vendor data of id `1945790520` contains null fields: " <>
-                 "%VendorProcessor.FileImport.VendorData{id: \"1945790520\", name: \"nil\", email: nil, phone: nil, address: \"44 Lehner Bridge\""
+                 "%VendorProcessor.VendorData{id: \"1945790520\", country: \"US\", name: \"nil\", email: nil,"
     end
   end
 
@@ -74,23 +74,27 @@ defmodule VendorProcessor.FileImport.CSVProcessorTest do
     [
       %VendorData{
         id: "4126494871",
+        country: "US",
         name: "Leuschke, Sanford and Weber",
         email: "virginie1945@kilback.info",
         phone: "376-888-6149",
         address: "53735 DuBuque Loaf",
         city: "Delphine",
         state: "MA",
-        zip: "85667"
+        zip: "85667",
+        currency: "USD"
       },
       %VendorData{
         id: "1945790520",
+        country: "US",
         name: "Mante, Wiegand and Kutch",
         email: "will2028@pollich.org",
         phone: "(424) 949-6807",
         address: "44 Lehner Bridge",
         city: "Lake Lillian",
         state: "WY",
-        zip: "31054"
+        zip: "31054",
+        currency: "USD"
       }
     ]
   end

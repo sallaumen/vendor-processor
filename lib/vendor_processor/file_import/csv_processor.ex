@@ -14,7 +14,7 @@ defmodule VendorProcessor.FileImport.CSVProcessor do
       "4126494871","Leuschke, Sanford and Weber","US","MA",...
   """
   require Logger
-  alias VendorProcessor.FileImport.VendorData
+  alias VendorProcessor.VendorData
 
   @spec process_csv_stream(String.t()) :: list(VendorData.t())
   def process_csv_stream(data_stream) do
@@ -44,13 +44,15 @@ defmodule VendorProcessor.FileImport.CSVProcessor do
   defp build_vendor_data({:ok, row}) do
     %VendorData{
       id: row["id"],
+      country: row["country"],
       name: row["name"],
       email: row["email"],
       phone: row["phone"],
       address: row["address"],
       city: row["city"],
       state: row["state"],
-      zip: row["zip"]
+      zip: row["zip"],
+      currency: row["currency"]
     }
   end
 end

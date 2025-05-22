@@ -1,4 +1,4 @@
-defmodule VendorProcessor.FileImport.VendorData do
+defmodule VendorProcessor.VendorData do
   @moduledoc """
   Documentation for `VendorData`.
   This module defines the structure of the vendor data.
@@ -8,24 +8,28 @@ defmodule VendorProcessor.FileImport.VendorData do
 
   @enforce_keys [
     :id,
+    :country,
     :name,
     :email,
     :phone,
     :address,
     :city,
     :state,
-    :zip
+    :zip,
+    :currency
   ]
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
           id: String.t(),
+          country: String.t(),
           name: String.t(),
           email: String.t(),
           phone: String.t(),
           address: String.t(),
           city: String.t(),
           state: String.t(),
-          zip: String.t()
+          zip: String.t(),
+          currency: String.t()
         }
 end

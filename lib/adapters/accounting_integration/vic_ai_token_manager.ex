@@ -1,4 +1,8 @@
 defmodule Adapters.AccountingIntegration.VicAiTokenManager do
+  @moduledoc """
+  This module manages the VicAi API token lifecycle. It retrieves a new token
+  when the old one is about to expire and provides a way to access the current
+  """
   use GenServer
   require Logger
 

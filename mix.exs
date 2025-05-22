@@ -26,7 +26,11 @@ defmodule VendorProcessor.MixProject do
     [
       {:csv, "~> 3.2"},
       {:req, "~> 0.5"},
-      {:plug, "~> 1.17"}
+      {:plug, "~> 1.17"},
+
+      # Test deps
+      {:ex_machina, "~> 2.8", only: :test},
+      {:faker, "~> 0.18", only: :test}
     ]
   end
 end
