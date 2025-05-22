@@ -14,6 +14,8 @@ defmodule Adapters.AccountingIntegration.VicAi do
   @client_id System.fetch_env!("VIC_AI_CLIENT_ID")
   @client_secret System.fetch_env!("VIC_AI_CLIENT_SECRET")
 
+  @success_statuses [200, 201]
+
   @impl true
   def authenticate() do
     params =
@@ -87,7 +89,7 @@ defmodule Adapters.AccountingIntegration.VicAi do
   defp get_authentication_headers(),
     do: [headers: [{"Authorization", VicAiTokenManager.get_token()}]]
 
-  defp parse_vendor_list_response({:ok, %Req.Response{status: 200} = response}) do
+  defp parse_vendor_list_response({:ok, %Req.Response{status: status} = response}) when status in @success_statuses do
     vendor_data =
       Enum.map(response.body, &vendor_response_to_vendor_data/1)
 
@@ -97,7 +99,8 @@ defmodule Adapters.AccountingIntegration.VicAi do
   defp parse_vendor_list_response({:error, _} = error), do: error
   defp parse_vendor_list_response(unmapped_case), do: {:error, {:unmapped_case, unmapped_case}}
 
-  defp parse_vendor_single_entry_response({:ok, %Req.Response{status: 200} = response}) do
+  defp parse_vendor_single_entry_response({:ok, %Req.Response{status: status} = response})
+       when status in @success_statuses do
     {:ok, vendor_response_to_vendor_data(response.body)}
   end
 
@@ -115,7 +118,8 @@ defmodule Adapters.AccountingIntegration.VicAi do
       country: vendor_raw_data["countryCode"],
       state: vendor_raw_data["addressState"],
       address: vendor_raw_data["addressStreet"],
-      currency: vendor_raw_data["currency"]
+      currency: vendor_raw_data["currency"],
+      updated_at: NaiveDateTime.from_iso8601!(vendor_raw_data["externalUpdatedAt"])
     }
   end
 

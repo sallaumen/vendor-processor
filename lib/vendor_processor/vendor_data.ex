@@ -18,7 +18,8 @@ defmodule VendorProcessor.VendorData do
     :zip,
     :currency
   ]
-  defstruct @enforce_keys
+  @optional_fields [:updated_at]
+  defstruct @enforce_keys ++ @optional_fields
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -30,6 +31,7 @@ defmodule VendorProcessor.VendorData do
           city: String.t(),
           state: String.t(),
           zip: String.t(),
-          currency: String.t()
+          currency: String.t(),
+          updated_at: NaiveDateTime.t() | nil
         }
 end

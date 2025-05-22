@@ -60,7 +60,7 @@ defmodule VendorProcessor.FileImport.CSVProcessorTest do
 
       assert log =~
                "[error] Vendor data of id `1945790520` contains null fields: " <>
-                 "%VendorProcessor.VendorData{id: \"1945790520\", country: \"US\", name: \"nil\", email: nil,"
+                 "%{id: \"1945790520\", name: \"nil\", state: \"WY\""
     end
   end
 
