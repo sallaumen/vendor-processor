@@ -7,3 +7,6 @@ config :vendor_processor, Adapters.AccountingIntegration.VicAi,
     retry_delay: 1,
     max_retries: 1
   ]
+
+config :vendor_processor, Adapters.AccountingIntegration.VicAiTokenManager,
+  authentication_fn: fn -> {:ok, %{body: %{"access_token" => "test_fake_token"}}} end

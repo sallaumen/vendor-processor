@@ -1,5 +1,5 @@
 defmodule VendorProcessor.FileImport.CSVProcessorTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias VendorProcessor.FileImport.CSVProcessor
   alias VendorProcessor.FileImport.VendorData
 
