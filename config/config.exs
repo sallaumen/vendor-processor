@@ -12,4 +12,8 @@ config :logger, :console,
     :pid
   ]
 
+config :vendor_processor, Ports.AccountingIntegration, adapter: Adapters.AccountingIntegration.VicAi
+
+config :vendor_processor, Adapters.AccountingIntegration.VicAi, vic_ai_req_options: []
+
 import_config "#{config_env()}.exs"
