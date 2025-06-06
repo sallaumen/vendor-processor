@@ -7,6 +7,8 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
   alias Support.Factories.VendorDataFactory
   alias Support.Factories.Adapters.VicAiFactory
 
+  @default_factory_updated_at ~N[2025-01-01 00:00:00]
+
   describe "authenticate/1" do
     test "when 200 response, should return {:ok, Req.Response} tuple with details" do
       Test.expect(VicAi, fn %{request_path: "/v0/token"} = conn ->
@@ -107,7 +109,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
     end
 
     test "when 200 response when vendors exist, should return {:ok, list(VendorData.t())}" do
-      vendor_data = VendorDataFactory.build(:generic)
+      vendor_data = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
       vendor_data_1_response = build_vendor_data_response(vendor_data)
 
       Test.expect(VicAi, fn %{request_path: "/v0/vendors"} = conn ->
@@ -118,8 +120,8 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
     end
 
     test "when 200 response when multiple vendors exist, should return {:ok, list(VendorData.t())}" do
-      vendor_data_1 = VendorDataFactory.build(:generic)
-      vendor_data_2 = VendorDataFactory.build(:generic)
+      vendor_data_1 = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
+      vendor_data_2 = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
       vendor_data_1_response = build_vendor_data_response(vendor_data_1)
       vendor_data_2_response = build_vendor_data_response(vendor_data_2)
 
@@ -133,7 +135,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
 
   describe "upsert_vendor/1" do
     test "when success on upsert, should return {:ok, VendorData.t()}" do
-      vendor_data = VendorDataFactory.build(:generic)
+      vendor_data = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
       vendor_data_1_response = build_vendor_data_response(vendor_data)
       expected_request_path = "/v0/vendors/#{vendor_data.id}"
 
