@@ -1,4 +1,7 @@
 defmodule VendorProcessor.Application do
+  @moduledoc """
+  OTP Application module for VendorProcessor.
+  """
   use Application
 
   @impl true

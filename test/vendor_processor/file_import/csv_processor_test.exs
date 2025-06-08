@@ -23,7 +23,7 @@ defmodule VendorProcessor.FileImport.CSVProcessorTest do
   """
 
   describe "process_csv_stream/1" do
-    test "when valid csv stream, should build VendorData for each line" do
+    test "when valid CSV stream provided, should build VendorData for each line" do
       result =
         @valid_csv
         |> stream_from_string()
@@ -33,7 +33,7 @@ defmodule VendorProcessor.FileImport.CSVProcessorTest do
       assert result == get_expected_valid_stream_process()
     end
 
-    test "when invalid line inside csv, should ignore filter invalid lines and process every other" do
+    test "when invalid line inside CSV, should filter invalid lines and process remaining" do
       log =
         capture_log(fn ->
           result =
@@ -47,7 +47,7 @@ defmodule VendorProcessor.FileImport.CSVProcessorTest do
       assert log =~ "[error] Vendor data of id `INVALID LINE WITHOUT CSV FORMAT` contains null fields:"
     end
 
-    test "when line with nil values, should ignore line with log" do
+    test "when line contains nil values, should ignore line and log error" do
       log =
         capture_log(fn ->
           result =
@@ -55,7 +55,7 @@ defmodule VendorProcessor.FileImport.CSVProcessorTest do
             |> stream_from_string()
             |> CSVProcessor.process_csv_stream()
 
-          assert length(result) == 0
+          assert Enum.empty?(result)
         end)
 
       assert log =~

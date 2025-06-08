@@ -16,7 +16,7 @@ defmodule VendorProcessor.FileImport.CSVProcessor do
   require Logger
   alias VendorProcessor.VendorData
 
-  @spec process_csv_stream(String.t()) :: list(VendorData.t())
+  @spec process_csv_stream(Enumerable.t()) :: list(VendorData.t())
   def process_csv_stream(data_stream) do
     data_stream
     |> CSV.decode(headers: true)

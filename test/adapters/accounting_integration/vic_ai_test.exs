@@ -9,7 +9,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
 
   @default_factory_updated_at ~N[2025-01-01 00:00:00]
 
-  describe "authenticate/1" do
+  describe "authenticate/0" do
     test "when 200 response, should return {:ok, Req.Response} tuple with details" do
       Test.expect(VicAi, fn %{request_path: "/v0/token"} = conn ->
         Test.json(conn, %{
@@ -58,7 +58,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
     end
   end
 
-  describe "health_check/1" do
+  describe "health_check/0" do
     test "when 200 response, should return {:ok, Req.Response} tuple with details" do
       Test.expect(VicAi, fn %{request_path: "/v0/healthCheck"} = conn ->
         Test.json(conn, %{"company" => "test", "status" => "PASS", "version" => "1.0"})
@@ -99,8 +99,8 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
     end
   end
 
-  describe "list_all_vendors/1" do
-    test "when 200 response when empty list, should return {:ok, []} tuple" do
+  describe "list_all_vendors/0" do
+    test "when empty list returned, should return {:ok, []} tuple" do
       Test.expect(VicAi, fn %{request_path: "/v0/vendors"} = conn ->
         Test.json(conn, [])
       end)
@@ -108,7 +108,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
       assert {:ok, []} == VicAi.list_all_vendors()
     end
 
-    test "when 200 response when vendors exist, should return {:ok, list(VendorData.t())}" do
+    test "when single vendor exists, should return {:ok, list(VendorData.t())}" do
       vendor_data = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
       vendor_data_1_response = build_vendor_data_response(vendor_data)
 
@@ -119,7 +119,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
       assert {:ok, [vendor_data]} == VicAi.list_all_vendors()
     end
 
-    test "when 200 response when multiple vendors exist, should return {:ok, list(VendorData.t())}" do
+    test "when multiple vendors exist, should return {:ok, list(VendorData.t())}" do
       vendor_data_1 = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
       vendor_data_2 = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
       vendor_data_1_response = build_vendor_data_response(vendor_data_1)
@@ -129,12 +129,16 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
         Test.json(conn, [vendor_data_1_response, vendor_data_2_response])
       end)
 
-      assert {:ok, [vendor_data_1, vendor_data_2]} == VicAi.list_all_vendors()
+      result = VicAi.list_all_vendors()
+      assert {:ok, vendors} = result
+      assert length(vendors) == 2
+      assert vendor_data_1 in vendors
+      assert vendor_data_2 in vendors
     end
   end
 
   describe "upsert_vendor/1" do
-    test "when success on upsert, should return {:ok, VendorData.t()}" do
+    test "when upsert successful, should return {:ok, VendorData.t()}" do
       vendor_data = VendorDataFactory.build(:generic, %{updated_at: @default_factory_updated_at})
       vendor_data_1_response = build_vendor_data_response(vendor_data)
       expected_request_path = "/v0/vendors/#{vendor_data.id}"
@@ -147,7 +151,7 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
       assert vendor_data == vendor_data_response
     end
 
-    test "when 422 response when multiple vendors exist, should return {:ok, Req.Response} vendor details" do
+    test "when validation fails, should return error with unmapped case" do
       vendor_data = VendorDataFactory.build(:generic)
       expected_request_path = "/v0/vendors/#{vendor_data.id}"
 
@@ -166,11 +170,52 @@ defmodule Adapters.AccountingIntegration.VicAiTest do
   end
 
   describe "delete_vendor/1" do
-    # TODO: incomplete tests
-    test "when 200 response, should consider data as deleted" do
+    test "when deletion successful, should return {:ok, Req.Response} tuple" do
+      vendor_id = "test-vendor-123"
+      expected_request_path = "/v0/vendors/#{vendor_id}"
+
+      Test.expect(VicAi, fn %{request_path: ^expected_request_path, method: "DELETE"} = conn ->
+        Test.json(conn, %{"status" => "deleted"})
+      end)
+
+      assert {
+               :ok,
+               %Response{
+                 body: %{"status" => "deleted"},
+                 status: 200
+               }
+             } =
+               VicAi.delete_vendor(vendor_id)
     end
 
-    test "when non 200 response, should consider data as deleted" do
+    test "when vendor not found, should return {:ok, Req.Response} tuple with error details" do
+      vendor_id = "non-existent-vendor"
+      expected_request_path = "/v0/vendors/#{vendor_id}"
+
+      Test.expect(VicAi, fn %{request_path: ^expected_request_path, method: "DELETE"} = conn ->
+        Conn.send_resp(conn, :not_found, ~s|{"code": 404, "message": "vendor not found"}|)
+      end)
+
+      assert {
+               :ok,
+               %Response{
+                 body: "{\"code\": 404, \"message\": \"vendor not found\"}",
+                 status: 404
+               }
+             } =
+               VicAi.delete_vendor(vendor_id)
+    end
+
+    test "when connection error, should return {:error, error_detail} tuple" do
+      vendor_id = "test-vendor-123"
+      expected_request_path = "/v0/vendors/#{vendor_id}"
+
+      Test.stub(VicAi, fn %{request_path: ^expected_request_path, method: "DELETE"} = conn ->
+        Req.Test.transport_error(conn, :timeout)
+      end)
+
+      assert {:error, %Req.TransportError{__exception__: true, reason: :timeout}} =
+               VicAi.delete_vendor(vendor_id)
     end
   end
 

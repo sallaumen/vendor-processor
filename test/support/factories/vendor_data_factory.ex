@@ -1,4 +1,7 @@
 defmodule Support.Factories.VendorDataFactory do
+  @moduledoc """
+  Factory for creating VendorData test fixtures.
+  """
   use ExMachina
   alias VendorProcessor.VendorData
 
@@ -12,7 +15,7 @@ defmodule Support.Factories.VendorDataFactory do
       address: Faker.Address.street_address(),
       city: Faker.Address.city(),
       state: Faker.Address.state(),
-      zip: 10000..99999 |> Enum.random() |> Integer.to_string(),
+      zip: 10_000..99_999 |> Enum.random() |> Integer.to_string(),
       currency: Enum.random(["USD", "CAD", "MXN"])
     }
   end
