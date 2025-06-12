@@ -1,4 +1,7 @@
 defmodule Support.Factories.Adapters.VicAiFactory do
+  @moduledoc """
+  Factory for creating VicAi API response test fixtures.
+  """
   use ExMachina
 
   def vendor_response_factory() do

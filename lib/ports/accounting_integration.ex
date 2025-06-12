@@ -1,4 +1,7 @@
 defmodule Ports.AccountingIntegration do
+  @moduledoc """
+  Port interface for accounting system integrations.
+  """
   @callback authenticate() :: {:ok, Req.Response.t()} | {:error, any()}
   @callback health_check() :: {:ok, Req.Response.t()} | {:error, any()}
   @callback list_all_vendors() :: {:ok, list(VendorProcessor.VendorData.t())} | {:error, any()}

@@ -11,6 +11,7 @@ defmodule VendorProcessor.FileImport.CSVImporter do
   alias VendorProcessor.FileImport.CSVProcessor
   alias Ports.AccountingIntegration
 
+  @spec import_csv(String.t()) :: :ok
   def import_csv(file_path) do
     start_time = start_cut_timer_and_wait_to_avoid_imprecision_errors()
 
@@ -21,9 +22,8 @@ defmodule VendorProcessor.FileImport.CSVImporter do
     else
       error ->
         Logger.error("CSV import from file path `#{file_path}` failed: `#{inspect(error)}`")
+        :ok
     end
-
-    :ok
   end
 
   defp start_cut_timer_and_wait_to_avoid_imprecision_errors do
@@ -33,6 +33,7 @@ defmodule VendorProcessor.FileImport.CSVImporter do
     start_time
   end
 
+  @spec upsert_and_validate_entries(String.t()) :: :ok | {:error, String.t()}
   defp upsert_and_validate_entries(file_path) do
     file_path
     |> build_vendor_data_from_csv()
@@ -40,18 +41,21 @@ defmodule VendorProcessor.FileImport.CSVImporter do
     |> validate_vendor_data_upsert()
   end
 
+  @spec build_vendor_data_from_csv(String.t()) :: list(VendorProcessor.VendorData.t())
   defp build_vendor_data_from_csv(file_path) do
     file_path
     |> File.stream!()
     |> CSVProcessor.process_csv_stream()
   end
 
+  @spec upsert_vendor_data(list(VendorProcessor.VendorData.t())) :: list({:ok, any()} | {:error, any()})
   defp upsert_vendor_data(vendors_data) do
     Enum.map(vendors_data, fn vendor_data ->
       AccountingIntegration.resolve().upsert_vendor(vendor_data)
     end)
   end
 
+  @spec validate_vendor_data_upsert(list({:ok, any()} | {:error, any()})) :: :ok | {:error, String.t()}
   defp validate_vendor_data_upsert(upsert_responses) do
     contains_error =
       Enum.any?(upsert_responses, fn upsert_response ->
@@ -68,6 +72,7 @@ defmodule VendorProcessor.FileImport.CSVImporter do
     if contains_error, do: {:error, "Failed to upsert vendor data"}, else: :ok
   end
 
+  @spec delete_all_older_entries_than(NaiveDateTime.t()) :: :ok
   defp delete_all_older_entries_than(time) do
     {:ok, all_vendors} = AccountingIntegration.resolve().list_all_vendors()
 
@@ -77,5 +82,7 @@ defmodule VendorProcessor.FileImport.CSVImporter do
         AccountingIntegration.resolve().delete_vendor(vendor.id)
       end
     end)
+
+    :ok
   end
 end

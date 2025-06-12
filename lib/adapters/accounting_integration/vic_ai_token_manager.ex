@@ -44,9 +44,10 @@ defmodule Adapters.AccountingIntegration.VicAiTokenManager do
   end
 
   defp request_new_token() do
-    with {:ok, %{body: %{"access_token" => token}}} <- do_authenticate() do
-      token
-    else
+    case do_authenticate() do
+      {:ok, %{body: %{"access_token" => token}}} ->
+        token
+
       err ->
         Logger.critical("Failed to update VicAi API token. Please check before old one expires. Details: #{inspect(err)}")
         nil
